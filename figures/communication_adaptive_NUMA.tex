@@ -1,0 +1,104 @@
+%\documentclass{article}
+%
+%\usepackage{tikz,pgfplots,verbatim}
+%\usepackage{url}
+%\usetikzlibrary{spy,arrows,backgrounds,plotmarks,shapes,snakes,fit}
+%
+%\definecolor{LightGray}{gray}{.7}
+%\definecolor{VeryLightGray}{gray}{.90}
+%\definecolor{mygray}{rgb}{0.4,0.4,0.4}
+%\definecolor{mygreen}{rgb}{0,0.8,0.6}
+%\definecolor{myorange}{rgb}{1.0,0.4,0}
+%\newcommand{\magn}[1]{\left\vert #1 \right\vert}
+%\newcommand{\SIMPLEX}[1]{\Delta\left(#1\right)}
+%\newcommand{\SPROFILE}{\mathbf{\Delta}}
+%\newcommand{\VERTSIMPLEX}[1]{\mathbf{\Delta}^*\left(#1\right)}
+%\newcommand{\RAND}[2]{{\sf rand}_{#1}\left[#2\right]}
+%
+\tikzset{box/.style={draw, minimum size=2em, text width=4.5em, text centered},
+         bigbox/.style={draw, inner sep=5pt, label={[align=center,shift={(-1.5ex,3ex)}]north east:\llap{#1}}, fill = LightGray, opacity = .5}
+}
+%
+%\begin{document}
+
+\begin{tikzpicture}[scale=4.5,
+    axis/.style={thick, ->, >=stealth'},
+    important line/.style={ultra thick},
+    thin line/.style={thin},
+    dashed line/.style={dashed, thin},
+    arrow/.style={ultra thick, ->, >=stealth', shorten <=2pt, shorten >=2pt},
+    every node/.style={color=black}
+    ]
+    
+	% Dynamic Scheduler    
+    \node[draw, rectangle, fill=VeryLightGray] (Estimate) at (0.4,-0.35) {$\texttt{estimate()}$};
+	\node[draw, rectangle] (i0) at (-0.2,0.0) {$\{(\tilde{v}_i(k),\alpha_i(k))\}_{i}$};
+    \draw[arrow] (i0) to [out=-90,in=-180] (Estimate);
+    \node[draw, rectangle, fill=VeryLightGray] (Optimize) at (1.2,-0.35) {$\texttt{optimize()}$};
+    \draw[arrow] (Estimate) to [out=0,in=-180] (Optimize);
+    \node[draw, rectangle] (o0) at (1.7,0.0) {$\{\alpha_i(k+1)\}_i$};
+    \draw[arrow] (Optimize) to [out=0,in=-90] (o0);
+    
+    \node[bigbox={},label=south:Dynamic Scheduler, fit=(i0)(Estimate)(Optimize)(o0)] (Scheduler) {};
+   
+    %\draw[] (0,0)  circle[radius=0.1cm] coordinate (a1) node[]{$a_1$};
+    \node[draw, circle,fill=VeryLightGray] (T1) at (0.0,.7) {$T_1$};
+    \node[draw, circle,fill=VeryLightGray] (T2) at (0.6,.7) {$T_2$};
+    \node[draw, circle,fill=VeryLightGray] (T3) at (1.3,0.7) {$T_n$};
+    \node (dots) at (1,0.7) {$\mathbf{\cdots}$};
+    %\draw[draw, circle] (a5) at (0.5,-0.2) {$a_5$};
+    
+    \node[draw, circle, fill=VeryLightGray] (CPU1) at (-0.3,1.4) {CPU $1$};
+    \node[draw, circle, fill=VeryLightGray] (CPU2) at (0.1,1.4) {CPU $2$};
+    \node[draw, circle, fill=VeryLightGray] (CPU3) at (0.5,1.4) {CPU $3$};
+    \node[draw, circle, fill=VeryLightGray] (CPU4) at (0.9,1.4) {CPU $4$};
+    \node (dots) at (1.2,1.4) {$\mathbf{\cdots}$};
+    \node[draw, circle, fill=VeryLightGray] (CPUm) at (1.6,1.4) {GPU};
+    
+    % Drawing NUMA nodes
+    % \node[draw, rectangle, minimum width = 3.5cm, minimum height = 2cm] (NUMA1) at (-0.1,1.4) {NUMA $1$};
+    \node[bigbox={},label=south:NUMA $1$, fit=(CPU1)(CPU2)] (NUMA1) {};
+    \node[bigbox={},label=south:NUMA $2$, fit=(CPU3)(CPU4)] (NUMA1) {};
+    
+    \node[] (RMT1) at (.0,.1) {};
+    \node[] (RMT2) at (.6,.1) {};
+    \node[] (RMT3) at (1.3,.1) {};
+    
+    %\draw[arrow] (a1) to [out=70,in=-90] (a2);
+    \draw[arrow] (T1) to [out=-120,in=120] (RMT1);\node at (-0.2,0.2) {{\small $\tilde{v}_1(k)$}};
+    \draw[arrow] (RMT1) to [out=60,in=-60] (T1);\node at (0.25,0.6) {{\small $\alpha_1(k+1)$}};
+    \draw[arrow] (T2) to [out=-120,in=120] (RMT2);\node at (0.38,0.2) {{\small $\tilde{v}_2(k)$}};
+    \draw[arrow] (RMT2) to [out=60,in=-60] (T2);\node at (0.9,0.6) {{\small $\alpha_2(k+1)$}};
+    \draw[arrow] (T3) to [out=-120,in=120] (RMT3);\node at (1.1,0.2) {{\small $\tilde{v}_n(k)$}};
+    \draw[arrow] (RMT3) to [out=60,in=-60] (T3);\node at (1.6,0.6) {{\small $\alpha_n(k+1)$}};
+    
+    \node at (-0.13,0.86) {{\small $\alpha_1(k)$}};
+    \node at (0.45,0.86) {{\small $\alpha_2(k)$}};
+    \node at (1.15,0.86) {{\small $\alpha_n(k)$}};
+    
+    \node[] (w1) at (-0.3,2) {};
+    \draw[arrow] (w1) to [out=-90,in=90] (CPU1);\node at (-0.2,1.9) {$w_1$};
+    \node[] (w2) at (.1,2) {};
+    \draw[arrow] (w2) to [out=-90,in=90] (CPU2);\node at (0.2,1.9) {$w_2$};
+    \node[] (w3) at (.5,2) {};
+    \draw[arrow] (w3) to [out=-90,in=90] (CPU3);\node at (0.6,1.9) {$w_3$};
+    \node[] (w4) at (0.9,2) {};
+    \draw[arrow] (w4) to [out=-90,in=90] (CPU4);\node at (1.0,1.9) {$w_4$};
+    
+    \node[] (wm) at (1.6,2) {};
+    \draw[arrow] (wm) to [out=-90,in=90] (CPUm);\node at (1.7,1.9) {$w_m$};
+    
+    %\draw[arrow] (User) to [out=180,in=90] (T1);\node at (0.0,1.1) {$\lambda_1,d_1(k)$};
+    %\draw[arrow] (User) to [out=-120,in=90] (T2);\node at (0.50,1.1) {$\lambda_2,d_2(k)$};
+    %\draw[arrow] (User) to [out=0,in=90] (T3);\node at (1.13,1.1) {$\lambda_n,d_n(k)$};
+    
+    \draw[arrow] (T1) to [out=90,in=-90] (CPU2);
+    \draw[arrow] (T2) to [out=90,in=-90] (CPU1);
+    \draw[arrow] (T3) to [out=90,in=-90] (CPU3);
+    
+
+
+\end{tikzpicture}
+
+
+% \end{document}
